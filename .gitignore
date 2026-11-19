@@ -1,0 +1,17 @@
+# 런타임 데이터 (작업, 제공자 키, 사용자 프리셋)
+/data/
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Frontend
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+/data-demo/
+/release/

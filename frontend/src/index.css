@@ -1,0 +1,397 @@
+@import "tailwindcss";
+
+/*
+ * 색은 전부 여기 변수로 둔다. 서울시립대 색(짙은 파랑, 에메랄드)과 흰 바탕이 기준이고,
+ * 다른 바탕을 쓰고 싶으면 이 값들만 바꾸면 된다 (아래 [data-theme="dark"] 참고).
+ *   파랑    = 내가 쥐고 있는 것 (고르기, 보호, 승인)
+ *   에메랄드 = 에이전트가 한 일 (도구 실행, 제안, 쓰는 중)
+ *   노랑    = 내가 긁어 둔 대목, 주의 표시
+ */
+@theme {
+  --color-bg: #ffffff;
+  --color-ink: #1a1a2e;
+  --color-muted: #63666a;
+  --color-line: #d9d9d6;
+  --color-hair: #ececea;
+  --color-edge: #bbbcbc;
+  --color-sunken: #f5f7fa;
+  --color-dark: #333333;
+  /*
+   * 양옆 패널의 면 (아래 .side). 가운데(대화, 원고 본문)만 흰색이고 양옆은 옅은 회청색으로 한 단 내려앉는다.
+   *   side      = 패널의 바탕 (sunken과 같은 색)
+   *   side-deep = 패널 안에서 한 단 더 들어간 것 (마우스를 올린 줄, 눌린 자리). 패널 안에서는 sunken이 이 색이 된다
+   *   side-hair = 패널 안의 가는 줄. 흰 바탕용 줄(hair)은 회청색 위에서 안 보인다
+   */
+  --color-side: #f5f7fa;
+  --color-side-deep: #e8edf4;
+  --color-side-hair: #dde3ea;
+
+  --color-blue: #004094;
+  --color-blue-hover: #005eb8;
+  --color-blue-tint: #eef3fa;
+  --color-sky: #9bcbed;
+  --color-mist: #b9d9eb;
+
+  --color-agent: #007a69;
+  --color-agent-tint: #e8f7f4;
+  --color-agent-mark: #cdefe8;
+
+  --color-mark: #ffe27a;
+  --color-mark-tint: #fff6d1;
+  --color-warn: #fbc02d;
+  --color-danger: #b3261e;
+
+  --font-sans: "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+  --font-serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", "AppleMyungjo", serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Code", Consolas, "D2Coding", ui-monospace, monospace;
+  /*
+   * 폰트를 따로 정하는 자리. 설정(lib/appearance.ts)이 고른 폰트로 이 변수들을 덮어쓴다.
+   *   --font-sans  = 시스템 (메뉴, 버튼, 대화)
+   *   --font-title = 원고 화면의 장 머리("1장"). 따로 정하지 않으면 시스템과 같다.
+   *                  본문에 적은 제목 줄(`# …`)에도 걸리는데, 그쪽은 골랐을 때만 달라진다 (.tk-h)
+   *   --font-body  = 본문 (원고, 출력, 읽는 글)
+   * 폰트 파일은 묶음에 들어 있다 (src/fonts/, scripts/fonts.mjs). 밖에서 받아 오지 않는다.
+   */
+  --font-title: var(--font-sans);
+  --font-body: var(--font-serif);
+}
+
+[data-theme="dark"] {
+  --color-bg: #14161c;
+  --color-ink: #e8e9ee;
+  --color-muted: #a3a6ad;
+  --color-line: #3a3d46;
+  --color-hair: #2a2d35;
+  --color-edge: #5a5e68;
+  --color-sunken: #1c1f27;
+  --color-side: #1c1f27;
+  --color-side-deep: #272b35;
+  --color-side-hair: #323640;
+  --color-dark: #e8e9ee;
+  --color-blue: #7fb2ff;
+  --color-blue-hover: #a5c9ff;
+  --color-blue-tint: #1b2740;
+  --color-agent: #4fd1bd;
+  --color-agent-tint: #12302c;
+  --color-agent-mark: #1d4a43;
+  --color-mark: #6b5a12;
+  --color-mark-tint: #3a3210;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  textarea,
+  input,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue-hover);
+    outline-offset: 1px;
+  }
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-edge) transparent;
+}
+
+/*
+ * 흰 바탕에서의 값을 따로 쥐어 둔다. 패널(.side) 안에서 sunken과 hair를 바꿔 끼우는데,
+ * 그 안에 뜨는 흰 것(팝업)은 다시 흰 바탕의 값을 써야 한다. 변수는 정한 자리에서 값으로 굳어 내려간다.
+ */
+:root,
+[data-theme] {
+  --base-sunken: var(--color-sunken);
+  --base-hair: var(--color-hair);
+}
+
+@layer components {
+  /*
+   * 양옆 패널의 면. 바탕을 내리고, 그 안에서 쓰는 "한 단 들어간 색"과 가는 줄을 이 바탕에 맞는 것으로 바꿔 끼운다.
+   * 그래서 패널 안의 부품은 흰 바탕에서 쓰던 이름(bg-sunken, border-hair)을 그대로 쓴다.
+   * 글을 쓰는 칸은 bg-bg(흰색)라서 이 면 위에서 칸으로 읽힌다.
+   */
+  .side {
+    background: var(--color-side);
+    --color-sunken: var(--color-side-deep);
+    --color-hair: var(--color-side-hair);
+  }
+  .side .pop {
+    --color-sunken: var(--base-sunken);
+    --color-hair: var(--base-hair);
+  }
+
+  /*
+   * 구역의 머리: 굵은 글자 위에 짧고 굵은 파란 줄 (시립대 사이트의 제목 줄).
+   * 구역을 나누는 머리에만 쓴다 (패널의 입력·도구·출력, 에이전트 패널의 지침·모델, 메인 화면의 작업). 작은 이름표에는 붙이지 않는다.
+   */
+  .head-bar {
+    position: relative;
+    margin: 0;
+    padding-top: 8px;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.35;
+  }
+  .head-bar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 3px;
+    background: var(--color-blue);
+  }
+
+  /* 본문에 쓰는 링크 모양 (버튼에도 쓴다) */
+  .link {
+    color: var(--color-blue);
+    background: none;
+    border: 0;
+    padding: 0;
+    text-align: left;
+  }
+  .link:hover {
+    color: var(--color-blue-hover);
+    text-decoration: underline;
+  }
+  .link:disabled {
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+
+  /* 에이전트가 쓴 글(마크다운) */
+  .prose-aleph {
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+  .prose-aleph > :first-child {
+    margin-top: 0;
+  }
+  .prose-aleph > :last-child {
+    margin-bottom: 0;
+  }
+  .prose-aleph p {
+    margin: 0.6em 0;
+  }
+  .prose-aleph h1,
+  .prose-aleph h2,
+  .prose-aleph h3,
+  .prose-aleph h4 {
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 1.1em 0 0.4em;
+  }
+  .prose-aleph h1 {
+    font-size: 1.25em;
+  }
+  .prose-aleph h2 {
+    font-size: 1.15em;
+  }
+  .prose-aleph h3 {
+    font-size: 1.05em;
+  }
+  .prose-aleph ul,
+  .prose-aleph ol {
+    margin: 0.5em 0;
+    padding-left: 1.4em;
+  }
+  .prose-aleph ul {
+    list-style: disc;
+  }
+  .prose-aleph ol {
+    list-style: decimal;
+  }
+  .prose-aleph li {
+    margin: 0.15em 0;
+  }
+  .prose-aleph code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--color-sunken);
+    padding: 0.1em 0.35em;
+  }
+  .prose-aleph pre {
+    background: var(--color-sunken);
+    padding: 0.75em 1em;
+    overflow-x: auto;
+    margin: 0.7em 0;
+  }
+  .prose-aleph pre code {
+    background: none;
+    padding: 0;
+  }
+  .prose-aleph blockquote {
+    margin: 0.7em 0;
+    padding: 0.1em 0 0.1em 1em;
+    color: var(--color-muted);
+    border-left: 2px solid var(--color-edge);
+  }
+  .prose-aleph hr {
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    margin: 1.2em 0;
+  }
+  .prose-aleph table {
+    border-collapse: collapse;
+    margin: 0.7em 0;
+    font-size: 0.95em;
+  }
+  .prose-aleph th,
+  .prose-aleph td {
+    border-bottom: 1px solid var(--color-hair);
+    padding: 0.3em 0.8em 0.3em 0;
+    text-align: left;
+  }
+  .prose-aleph th {
+    border-bottom-color: var(--color-ink);
+  }
+  .prose-aleph a {
+    color: var(--color-blue);
+    text-decoration: underline;
+  }
+
+  /* 원고 — 읽고 쓰는 글. 크기와 줄 간격은 설정이 변수로 바꾼다 (없으면 뒤의 값). */
+  .manuscript {
+    font-family: var(--font-body);
+    font-size: var(--body-size, 16.5px);
+    line-height: var(--body-leading, 2);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .manuscript.small {
+    font-size: calc(var(--body-size, 16.5px) - 1.5px);
+  }
+
+  /*
+   * 원고 화면의 장면 경계 (components/ManuscriptView.tsx).
+   * 평소에는 안 보여서 글이 그냥 이어져 보이고, 마우스를 올린 장면과 초점이 든 장면에서만 흐리게 뜬다.
+   * 자리는 늘 차지한다: 본문의 빈 줄 하나 높이라서 장면 사이가 문단 사이처럼 보이고, 보이기만 바뀌므로 글이 밀리지 않는다.
+   */
+  .scene-edge {
+    height: calc(var(--body-size, 16.5px) * var(--body-leading, 2));
+    opacity: 0;
+    transition: opacity 0.14s ease;
+  }
+  .scene:hover > .scene-edge,
+  .scene:focus-within > .scene-edge,
+  /* 그 장면의 아래쪽 경계는 다음 장면의 위쪽 경계다. 같이 떠야 어디서 어디까지가 이 장면인지 보인다. */
+  .scene:hover + .scene > .scene-edge,
+  .scene:focus-within + .scene > .scene-edge {
+    opacity: 1;
+  }
+  /* 아래쪽 경계로 뜬 것은 줄과 번호뿐이다. 합치기 버튼은 그 장면 자신의 경계일 때만 보인다. */
+  .scene-edge > button {
+    opacity: 0;
+    transition: opacity 0.14s ease;
+  }
+  .scene:hover > .scene-edge > button,
+  .scene:focus-within > .scene-edge > button {
+    opacity: 1;
+  }
+
+  /* 버튼 옆에 뜨는 작은 팝업 (메뉴, 고르기) */
+  .pop {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  }
+
+  /* 패널 사이를 끌어 너비를 바꾸는 손잡이 */
+  .resizer {
+    position: relative;
+    flex: none;
+    width: 1px;
+    background: var(--color-line);
+    cursor: col-resize;
+    z-index: 5;
+  }
+  .resizer::after {
+    content: "";
+    position: absolute;
+    inset: 0 -4px;
+  }
+  .resizer:hover,
+  .resizer.dragging {
+    background: var(--color-blue);
+    box-shadow: 0 0 0 1px var(--color-blue);
+  }
+}
+
+@keyframes aleph-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin {
+  animation: aleph-spin 0.8s linear infinite;
+}
+
+@keyframes aleph-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--color-agent);
+  animation: aleph-blink 1s steps(1) infinite;
+}
+
+@keyframes aleph-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.pulse {
+  animation: aleph-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret::after,
+  .pulse,
+  .spin {
+    animation: none;
+  }
+  .scene-edge,
+  .scene-edge > button {
+    transition: none;
+  }
+}

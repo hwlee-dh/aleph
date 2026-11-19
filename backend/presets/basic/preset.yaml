@@ -1,0 +1,12 @@
+name: 기본
+description: 이론을 정해 두지 않은 범용 프리셋. 집필, 비평, 요약 도구가 들어 있다.
+model: ''
+temperature: null
+thinking: default
+tool_order:
+- compose
+- critique
+- summarize
+starter_notes:
+- 작품 노트
+- 계획
