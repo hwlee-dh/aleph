@@ -1,0 +1,15 @@
+/* scripts/fonts.mjs가 만든 파일. 손으로 고치지 않는다 (`npm run fonts`). */
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../node_modules/pretendard/dist/web/static/woff2/Pretendard-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../../node_modules/pretendard/dist/web/static/woff2/Pretendard-Bold.woff2") format("woff2");
+}

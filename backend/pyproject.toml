@@ -1,0 +1,31 @@
+[project]
+name = "aleph"
+version = "0.4.0"
+requires-python = ">=3.13"
+dependencies = [
+    "brotli>=1.2.1",
+    "fastapi>=0.163.0",
+    "fonttools>=4.68.0",
+    "httpx>=0.28.1",
+    "pydantic-ai-slim[anthropic,google,openai,openrouter]>=2.68.0",
+    "pypdf>=7.1.0",
+    "python-dotenv>=1.2.4",
+    "pyyaml>=6.0.3",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[tool.aleph]
+# 버전 번호(위의 version)를 올린 날. 메인 화면에 번호와 나란히 보인다. 번호를 올릴 때 같이 고친다.
+date = "2026-11-17"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.5.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+pythonpath = ["."]
